@@ -2,11 +2,11 @@ var async = require("async");
 const readline = require("readline");
 const request = require("request");
 
-const baseUrl = "http://open.mapquestapi.com/geocoding/v1/address";
-const key = "n71CKGruKLq6MKcZ5MOSiXuouMwFNjpH";
-const baseTimeUrl = "http://vip.timezonedb.com/v2.1/get-time-zone";
+const mapsBaseUrl = "http://open.mapquestapi.com/geocoding/v1/address";
+const mapsApiKey = "n71CKGruKLq6MKcZ5MOSiXuouMwFNjpH";
+const timeBaseUrl = "http://vip.timezonedb.com/v2.1/get-time-zone";
 const timeApiKey = "3QDHUOVAKQ19";
-const baseweatherurl = "http://api.openweathermap.org/data/2.5/weather";
+const weatherBaseurl = "http://api.openweathermap.org/data/2.5/weather";
 const weatherApiKey = "eb9ac32155d8fcbaf134c1c46ad9582c";
 
 const readLineInterface = readline.createInterface({
@@ -14,7 +14,20 @@ const readLineInterface = readline.createInterface({
   output: process.stdout
 });
 
-mainFunctionality = (location, callBack) => {};
+mainFunctionality = (locationArrayItem, callBack) => {
+  const locationItem = locationArrayItem.trim();
+  let url = mapsBaseUrl + "?key=" + mapsApiKey + "&location=" + locationItem;
+
+  request.get(url, function(error, response, body) {
+    let json = body && JSON.parse(body);
+    let latitude = json.results[0].locations[0].latLng.lat;
+    let longitutde = json.results[0].locations[0].latLng.lng;
+
+    console.log("coordinates: ", latitude, " : ", longitutde);
+
+    callBack();
+  });
+};
 
 readLineInterface.question(
   "Input: An array of location name and  postal code\nFormat: New York, 10005, Tokyo, São Paulo, Pluto\n ",
