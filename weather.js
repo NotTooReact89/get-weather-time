@@ -23,8 +23,30 @@ mainFunctionality = (locationArrayItem, callBack) => {
     let latitude = json.results[0].locations[0].latLng.lat;
     let longitutde = json.results[0].locations[0].latLng.lng;
 
-    console.log("coordinates: ", latitude, " : ", longitutde);
+    let timeApiUrl =
+      timeBaseUrl +
+      "?key=" +
+      timeApiKey +
+      "&by=position" +
+      "&lat=" +
+      latitude +
+      "&lng=" +
+      longitutde +
+      "&format=json";
+    getLocationCurrentTime = callBack => {
+      request
+        .get(timeApiUrl, function(error, response, body) {
+          let timeResponse = body && JSON.parse(body);
+          let currentTime = timeResponse && timeResponse.formatted;
+          console.log(currentTime);
+        })
+        .on("error", function(err) {
+          console.error(err);
+        });
+      callBack();
+    };
 
+    async.waterfall([getLocationCurrentTime], function(err, result) {});
     callBack();
   });
 };
