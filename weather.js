@@ -16,10 +16,11 @@ const readLineInterface = readline.createInterface({
 
 mainFunctionality = (locationArrayItem, callBack) => {
   const locationItem = locationArrayItem.trim();
-  let url = mapsBaseUrl + "?key=" + mapsApiKey + "&location=" + locationItem;
+  let mapsApiUrl =
+    mapsBaseUrl + "?key=" + mapsApiKey + "&location=" + locationItem;
 
-  request.get(url, function(error, response, body) {
-    let json = body && JSON.parse(body);
+  request.get(mapsApiUrl, function(error, response, body) {
+    const json = body && JSON.parse(body);
     let latitude = json.results[0].locations[0].latLng.lat;
     let longitutde = json.results[0].locations[0].latLng.lng;
 
@@ -38,7 +39,7 @@ mainFunctionality = (locationArrayItem, callBack) => {
         .get(timeApiUrl, function(error, response, body) {
           let timeResponse = body && JSON.parse(body);
           let currentTime = timeResponse && timeResponse.formatted;
-          console.log(currentTime);
+          console.log(`"${locationItem}" => ` + currentTime);
         })
         .on("error", function(err) {
           console.error(err);
@@ -46,13 +47,29 @@ mainFunctionality = (locationArrayItem, callBack) => {
       callBack();
     };
 
-    async.waterfall([getLocationCurrentTime], function(err, result) {});
+    let weatherApiUrl =
+      weatherBaseurl +
+      "?APPID=" +
+      weatherApiKey +
+      "&lat=" +
+      latitude +
+      "&lon=" +
+      longitutde;
+    getLocationCurrentWeather = () => {
+      request.get(weatherApiUrl, function(error, response, body) {
+        console.log(`"${locationItem}" => ` + body);
+      });
+    };
+
+    async.waterfall([getLocationCurrentTime], function(err, result) {
+      getLocationCurrentWeather();
+    });
     callBack();
   });
 };
 
 readLineInterface.question(
-  "Input: An array of location name and  postal code\nFormat: New York, 10005, Tokyo, São Paulo, Pluto\n ",
+  "Enter an array of location name and  postal code\nFormat: New York, 10005, Tokyo, São Paulo, Pluto\n ",
   answer => {
     answer = answer.split(",");
     async.eachSeries(answer, mainFunctionality, function(err) {});
