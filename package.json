@@ -8,7 +8,7 @@
   "author": "Sharan Dhanala",
   "license": "ISC",
   "dependencies": {
-    "async": "^2.6.2",
+    "async": "^3.2.2",
     "readline": "^1.3.0",
     "request": "^2.88.0"
   }
